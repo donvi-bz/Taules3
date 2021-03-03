@@ -1,0 +1,1 @@
+entity-packages: biz.donvi.taules3.models

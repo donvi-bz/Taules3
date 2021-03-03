@@ -1,0 +1,71 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id('io.ebean') version '12.6.2'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'biz.donvi.taules3.Taules'
+        )
+    }
+}
+
+group 'biz.donvi'
+version '0.1'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    // Started here
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    // Discord bot
+    compile ('net.dv8tion:JDA:4.2.0_227') {
+        exclude module: 'opus-java'
+    }
+
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.22'
+
+    // ebean
+    compile 'io.ebean:ebean:12.6.2'
+    compile 'io.ebean:ebean-querybean:12.6.2'
+    // query bean generation
+    annotationProcessor 'io.ebean:querybean-generator:12.6.2'
+    // ebean test
+    testCompile 'io.ebean:ebean-test:12.6.2'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    // Lombok Test
+    testCompileOnly 'org.projectlombok:lombok:1.18.16'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+task copyToMainOut(type: Copy) {
+    dependsOn(tasks.jar)
+    dependsOn(tasks.shadowJar)
+    delete file("./out/Taules3.jar")
+    from file("./build/libs/Taules3-${project.version}-all.jar")
+    into file("./out/")
+    rename "-${project.version}-all", ''
+}
