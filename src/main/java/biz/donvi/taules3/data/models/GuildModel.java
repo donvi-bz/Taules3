@@ -1,6 +1,5 @@
-package biz.donvi.taules3.models;
+package biz.donvi.taules3.data.models;
 
-import io.ebean.annotation.Cache;
 import io.ebean.annotation.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity @Table(name = "user")
+@Entity @Table(name = "guild")
 @Data @AllArgsConstructor
-public class UserModel {
-    @Id @NotNull long   user_id;
+public class GuildModel {
+    @Id @NotNull long   guild_id;
     @NotNull     String name;
+
+    public GuildModel() { }
 }

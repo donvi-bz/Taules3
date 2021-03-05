@@ -1,6 +1,8 @@
 package biz.donvi.taules3;
 
 
+import biz.donvi.taules3.data.DataManager;
+import biz.donvi.taules3.graphing.ClInput;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
@@ -11,26 +13,34 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import static biz.donvi.taules3.Util.getResourceFileAsString;
+import static biz.donvi.taules3.util.Util.getResourceFileAsString;
 
 public class Taules {
 
-    public final JDA jda;
-//    public final ScheduledExecutorService scheduler   = Executors.newScheduledThreadPool(1);
+    public final JDA                      jda;
+    public final DataManager              dataManager = new DataManager(this);
+    public final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public static void main(String[] args) throws LoginException, IOException { new Taules(); }
 
     private Taules() throws LoginException, IOException {
-//        scheduler.scheduleAtFixedRate(this::maybeDisableScheduler, 1, 1, TimeUnit.MINUTES);
-//        scheduler.scheduleAtFixedRate(dataManager::update, 5, 15, TimeUnit.SECONDS);
+        GenericListener gl = new GenericListener(this);
+        scheduler.scheduleAtFixedRate(() -> {if (!keepRunning()) scheduler.shutdown();}, 1, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(gl::periodicUpdate, 2, 57, TimeUnit.SECONDS);
 //
         initDb();
         jda = JDABuilder
             .createDefault(getResourceFileAsString("token"))
             .setEventManager(new AnnotatedEventManager())
-            .addEventListeners(new GenericListener(this))
+            .addEventListeners(gl)
             .build();
+        new ClInput(this).inputLoop();
+        scheduler.shutdown();
+        System.out.println("Taules down.");
     }
 
     private void initDb() {
@@ -54,7 +64,8 @@ public class Taules {
         Database database = DatabaseFactory.create(config);
     }
 
-    private void maybeDisableScheduler() {
-//        if (jda == null || jda.getStatus() == JDA.Status.SHUTDOWN) scheduler.shutdown();
+    public boolean keepRunning(){
+        return jda != null && jda.getStatus() != JDA.Status.SHUTDOWN;
     }
+
 }

@@ -1,17 +1,21 @@
 package biz.donvi.taules3;
 
-import biz.donvi.taules3.models.GuildModel;
-import biz.donvi.taules3.models.GuildUserModel;
-import biz.donvi.taules3.models.MessageLogModel;
-import biz.donvi.taules3.models.UserModel;
-import biz.donvi.taules3.models.query.QGuildUserModel;
+import biz.donvi.taules3.data.models.CallLogModel;
+import biz.donvi.taules3.data.models.GuildUserModel;
+import biz.donvi.taules3.data.models.MessageLogModel;
+import biz.donvi.taules3.data.models.UserModel;
+import biz.donvi.taules3.data.models.query.QCallLogModel;
+import biz.donvi.taules3.data.models.query.QGuildUserModel;
 import io.ebean.DB;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
+import java.security.Timestamp;
 import java.util.Calendar;
+import java.util.List;
 
 public class GenericListener {
     private final Taules taules;
@@ -20,39 +24,54 @@ public class GenericListener {
 
     @SubscribeEvent
     public void onReady(ReadyEvent readyEvent) {
-        for (Guild guild : taules.jda.getGuilds()) {
-            GuildModel guildModel = new GuildModel(guild.getIdLong(), guild.getName());
-            if (DB.find(GuildModel.class, guildModel.getGuild_id()) == null)
-                 DB.save(guildModel);
-            else DB.update(guildModel);
-        }
+        taules.dataManager.updateGuilds();
+        taules.dataManager.updateAllCallRecords();
+    }
+
+    public void periodicUpdate(){
+        taules.dataManager.updateGuilds();
+        taules.dataManager.updateUsers();
     }
 
     @SubscribeEvent
     public void onMessageReceived(GuildMessageReceivedEvent event) {
-        final long guildId = event.getGuild().getIdLong();
-        final long userId  = event.getAuthor().getIdLong();
+        // If we get a bot or a non-member, dip
         if (event.getAuthor().isBot() || event.getMember() == null) return;
-        if (DB.find(UserModel.class, userId) == null) try {
-            DB.save(new UserModel(userId, event.getAuthor().getName()));
-        } catch (Throwable t) {
-            System.out.println(Calendar.getInstance().getTime().toString());
-            System.out.println("UserId: " + userId);
-            System.out.println("Author Name: " + event.getAuthor().getName());
-            t.printStackTrace();
+        // Logic
+        GuildUserModel guildUser = taules.dataManager.getGuildUserModel(event.getGuild().getIdLong(), event.getMember());
+        DB.save(new MessageLogModel(guildUser.getId()));
+    }
+
+    @SubscribeEvent
+    public void onVoiceJoined(GuildVoiceJoinEvent event) {
+        // If we get a bot, dip
+        if (event.getMember().getUser().isBot()) return;
+        // Logic
+        GuildUserModel guildUser = taules.dataManager.getGuildUserModel(event.getGuild().getIdLong(), event.getMember());
+        DB.save(new CallLogModel(guildUser.getId()));
+    }
+
+    @SubscribeEvent
+    public void onVoiceLeft(GuildVoiceLeaveEvent event) {
+        // If we get a bot, dip
+        if (event.getMember().getUser().isBot()) return;
+        // Logic
+        GuildUserModel guildUser = taules.dataManager.getGuildUserModel(event.getGuild().getIdLong(), event.getMember());
+        List<CallLogModel> callLogs = new QCallLogModel()
+            .guild_user.eq(guildUser.getId())
+            .time_left.eq(null)
+            .order("time_joined DESC")
+            .findList();
+        if (callLogs.size() >= 1) {
+            callLogs.get(0).setTime_left(new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()));
+            DB.save(callLogs.get(0));
+            if (callLogs.size() > 1){
+                for(int i = 1; i < callLogs.size(); i++){
+                    callLogs.get(i).setTime_left(callLogs.get(i).getTime_joined());
+                    DB.save(callLogs.get(i));
+                }
+            }
         }
-        GuildUserModel gum = new QGuildUserModel()
-            .guild.equalTo(guildId)
-            .user.equalTo(userId)
-            .findOne();
-        if (gum == null) {
-            DB.save(new GuildUserModel(guildId, event.getMember()));
-            gum = new QGuildUserModel()
-                .guild.equalTo(guildId)
-                .user.equalTo(userId)
-                .findOne();
-        }
-        assert gum != null;
-        DB.save(new MessageLogModel(gum.getId()));
+
     }
 }

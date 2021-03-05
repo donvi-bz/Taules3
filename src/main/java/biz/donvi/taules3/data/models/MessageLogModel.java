@@ -1,4 +1,4 @@
-package biz.donvi.taules3.models;
+package biz.donvi.taules3.data.models;
 
 import io.ebean.annotation.NotNull;
 import lombok.Data;
@@ -15,6 +15,8 @@ public class MessageLogModel {
     @Id @NotNull int       id;
     @NotNull     int       guild_user;
     @NotNull     Timestamp time_sent;
+
+    public MessageLogModel() { }
 
     public MessageLogModel(int guild_user) {
         this.guild_user = guild_user;

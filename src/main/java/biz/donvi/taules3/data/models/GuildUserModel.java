@@ -1,4 +1,4 @@
-package biz.donvi.taules3.models;
+package biz.donvi.taules3.data.models;
 
 import io.ebean.annotation.NotNull;
 import lombok.Data;
@@ -17,6 +17,8 @@ public class GuildUserModel {
     @NotNull     String display_name;
                  String last_color;
 
+    public GuildUserModel() { }
+
     public GuildUserModel(long guild, long user, String display_name, String last_color) {
         this.guild = guild;
         this.user = user;
@@ -28,6 +30,8 @@ public class GuildUserModel {
         this(guildId,
              guildMember.getIdLong(),
              guildMember.getEffectiveName(),
-             Integer.toHexString(guildMember.getColor().getRed()));
+             guildMember.getColor() != null
+                 ? Integer.toHexString(guildMember.getColor().getRGB())
+                 : "00000000");
     }
 }

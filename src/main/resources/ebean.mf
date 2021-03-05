@@ -1,1 +1,1 @@
-entity-packages: biz.donvi.taules3.models
+entity-packages: biz.donvi.taules3.data.models

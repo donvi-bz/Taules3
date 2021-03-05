@@ -25,6 +25,7 @@ version '0.1'
 repositories {
     mavenCentral()
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
@@ -39,6 +40,15 @@ dependencies {
 
     // MySQL
     implementation 'mysql:mysql-connector-java:8.0.22'
+
+    // Apache string utils
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
+    // My own GnuPlotter lib :D
+    implementation group: 'biz.donvi', name: 'GnuPlotter', version: '1.1'
+
+    // Web? WEB?
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
     // ebean
     compile 'io.ebean:ebean:12.6.2'
