@@ -2,7 +2,6 @@ package biz.donvi.taules3;
 
 
 import biz.donvi.taules3.data.DataManager;
-import biz.donvi.taules3.graphing.ClInput;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;

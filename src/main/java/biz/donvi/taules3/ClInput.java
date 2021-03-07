@@ -1,6 +1,7 @@
-package biz.donvi.taules3.graphing;
+package biz.donvi.taules3;
 
 import biz.donvi.taules3.Taules;
+import biz.donvi.taules3.graphing.MessageGraph;
 import biz.donvi.taules3.util.ConsoleColor;
 import biz.donvi.taules3.util.Util;
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +29,17 @@ public class ClInput {
         commands.put("update-users", this::cmdUpdateUsers);
         commands.put("active-dir", this::cmdPrintActiveDir);
         commands.put("update-current-calls", this::cmdUpdateCurrentCalls);
+        commands.put("plot-messages",this::generatePlot);
 
     }
 
-    public void inputLoop() { while (taules.keepRunning()) getInput(in.nextLine()); }
+    public void inputLoop() {
+        while (taules.keepRunning()) try{
+            getInput(in.nextLine());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     private void getInput(final String input) {
         String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ") - 1) : input;
@@ -83,6 +91,10 @@ public class ClInput {
             "Updated current call records taking " +
             Util.timedCompletion(taules.dataManager::updateAllCallRecords) +
             " milliseconds.");
+    }
+
+    private void generatePlot(String args){
+        new MessageGraph(1,1).generatePlot(taules.dataManager);
     }
 
 }
