@@ -2,7 +2,7 @@
 uLoc = "D:/Laptop/Java/Taules3/plot/callData_001.txt"
 
 # Variables
-lineW = 2
+lineW = 3
 
 # Settings
 set terminal wxt size 1600,900
@@ -10,7 +10,7 @@ set xrange [0:24]
 set yrange [0:10]
 
 set xlabel "Time of day (EST)" font ",13"
-set ylabel "Users in a call" font ",13"
+set ylabel "People in a call" font ",13"
 
 set xtics 1
 set ytics 1

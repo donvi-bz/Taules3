@@ -25,9 +25,11 @@ public class ClInput {
         this.taules = taules;
         in = new Scanner(System.in);
         commands.put("help",                 this::cmdHelp);
+        commands.put("l",                    null);
+        commands.put("last",                 null);
+        commands.put("active-dir",           this::cmdPrintActiveDir);
         commands.put("update-guilds",        this::cmdUpdateGuilds);
         commands.put("update-users",         this::cmdUpdateUsers);
-        commands.put("active-dir",           this::cmdPrintActiveDir);
         commands.put("update-current-calls", this::cmdUpdateCurrentCalls);
         commands.put("plot-messages",        this::generateMessagePlot);
         commands.put("plot-calls",           this::generateCallPlot);
@@ -42,9 +44,16 @@ public class ClInput {
         }
     }
 
-    private void getInput(final String input) {
+    private String lastInput = "";
+
+    private void getInput(String input) {
+        if (input.equalsIgnoreCase("l") || input.equalsIgnoreCase("last")) {
+            System.out.println("Running last input:\n" + lastInput);
+            input = lastInput;
+        }
         String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ")) : input;
         commands.getOrDefault(firstArg, this::cmdNotFound).accept(input);
+        lastInput = input;
     }
 
     private void cmdNotFound(String input) {
@@ -94,17 +103,23 @@ public class ClInput {
             " milliseconds.");
     }
 
+    private MessageGraph messageGraph = null;
     private void generateMessagePlot(String args){
+        args = args.substring(args.indexOf(' ') + 1);
         boolean showUsage = false;
-        if (args.substring(args.indexOf(' ') + 1).startsWith("?")){
+        if (args.startsWith("?")){
             System.out.println("Usage:");
             showUsage = true;
+        } else if (args.startsWith("last")){
+            if (messageGraph != null) messageGraph.displayPlot();
+            else System.out.println("No currently stored message-plot exists.");
         } else {
             try {
                 String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
                 int averageOver = Integer.parseInt(args.substring(args.lastIndexOf(' ') + 1));
                 System.out.println("Generating plot for '" + guildName + "' averaging over " + averageOver + " minutes...");
-                new MessageGraph(1,1).generatePlot(taules.dataManager, guildName, averageOver);
+                messageGraph = new MessageGraph(1,1);
+                messageGraph.generatePlot(taules.dataManager, guildName, averageOver);
             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                 System.out.println("Incorrect format. Proper usage:");
                 showUsage = true;
@@ -114,10 +129,17 @@ public class ClInput {
             ConsoleColor.YELLOW + "plot-messages \"<Guild Name>\" <average-over>" + ConsoleColor.RESET);
 
     }
-
+    private CallGraph callGraph = null;
     private void generateCallPlot(String args){
-        String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
-        new CallGraph(1, 1).generatePlot(taules.dataManager, guildName, 1);
+        args = args.substring(args.indexOf(' ') + 1);
+        if (args.startsWith("last")){
+            if (callGraph != null) callGraph.displayPlot();
+            else System.out.println("No currently stored call-plot exists.");
+        } else {
+            String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
+            callGraph = new CallGraph(1, 1);
+            callGraph.generatePlot(taules.dataManager, guildName, 1);
+        }
     }
 
 }

@@ -2,7 +2,7 @@
 uLoc = "D:/Laptop/Java/Taules3/plot/messageData_001.txt"
 
 # Variables
-lineW = 2
+lineW = 3
 
 # Settings
 set terminal wxt size 1600,900

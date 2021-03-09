@@ -31,22 +31,30 @@ public class MessageGraph extends GenericGuildInfoGraph {
         for(MessageActivityAggregate ma : items) {
             int dayOfWeek = ma.getDayOfWeek();
             int minute = ma.getTimeOfDay();
-            double messageAvgAtTime = (double) ma.getMessageCount() / ma.getDaysSampled();
+            double messageAvgAtTime = (double) ma.getMessageCount() / ma.getDaysSampled(); // todo not the right average
             for (int i = minute - leftHalf, j = 0; i < minute + rightHalf; i++, j++) {
                 try {
-                    data[(i + recordCount) % recordCount][dayOfWeek] += 60 * messageAvgAtTime * smoothingCurve[j];
+                    int plotDay = dayOfWeek + 7;
+                    if (i >= recordCount) plotDay++;
+                    else if (i < 0) plotDay--;
+                    plotDay %= 7;
+                    data[(i + recordCount) % recordCount][plotDay] += 60 * messageAvgAtTime * smoothingCurve[j];
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+        // Better looking wrap around
+        for(int i = 0; i < 6; i++)
+            data[recordCount][i] = data[0][(i + 8) % 7];
+
+        // Adding the averaging
         for (int i = 0; i < data.length; i++) {
             double sum = 0;
             for(int j = 0; j < 7; j++)
                 sum += data[i][j];
             data[i][7] = sum / 7;
         }
-        data[recordCount] = data[0];
 
         double[][] xAxis = new double[recordCount + 1][];
         for (int i = 0; i < xAxis.length; i++) {
@@ -58,7 +66,7 @@ public class MessageGraph extends GenericGuildInfoGraph {
 
     @Override
     public void displayPlot() {
-        plotter.plot(true);
+        plotter.plot();
     }
 
 }

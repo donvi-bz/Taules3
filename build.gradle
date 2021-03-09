@@ -45,7 +45,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
     // My own GnuPlotter lib :D
-    implementation group: 'biz.donvi', name: 'GnuPlotter', version: '1.1'
+    implementation group: 'biz.donvi', name: 'GnuPlotter', version: '1.2'
 
     // Web? WEB?
     implementation("com.squareup.okhttp3:okhttp:4.9.0")

@@ -5,6 +5,7 @@ import biz.donvi.taules3.data.models.CallLogModel;
 import io.ebean.DB;
 import io.ebean.RawSqlBuilder;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,18 +40,22 @@ public class CallGraph extends GenericGuildInfoGraph{
 
         LocalDateTime dateTime;
         for(CallLogModel callLog : callLogList){
-            final int startMinute, endMinute, dayOfWeek;
+            int startMinute, endMinute, dayOfWeek;
             // Prep
             dateTime = callLog.getTime_joined().toLocalDateTime();
             startMinute = dateTime.getHour() * 60 + dateTime.getMinute();
-            dayOfWeek = dateTime.getDayOfWeek().ordinal() ; // Why must week start on monday?
+            dayOfWeek = (dateTime.getDayOfWeek().ordinal() + 1) % 7; // Why must week start on monday?
             if (callLog.getTime_left() != null)
                  dateTime = callLog.getTime_left().toLocalDateTime();
             else dateTime = LocalDateTime.now();
             endMinute = dateTime.getHour() * 60 + dateTime.getMinute();;
+            // If the start and end are the same, don't bother displaying
+            if (startMinute == endMinute) continue;
+            // If we roll over, add one day to the minute end
+            if (endMinute < startMinute) endMinute += recordCount;
             // Point dumping
-            for (int minuteInGraph = startMinute; minuteInGraph <= endMinute; minuteInGraph++)
-                ++data[minuteInGraph % data.length][(dayOfWeek + (minuteInGraph >= data.length ? 0 : 1)) % 7];
+            for (int minuteInGraph = startMinute; minuteInGraph < endMinute; minuteInGraph++)
+                ++data[minuteInGraph % data.length][(dayOfWeek + (minuteInGraph >= data.length ? 1 : 0)) % 7];
 
         }
         // Adding average
@@ -60,7 +65,8 @@ public class CallGraph extends GenericGuildInfoGraph{
                 sum += data[i][j];
             data[i][7] = sum / 7;
         }
-        data[recordCount] = data[0];
+        // Make the way last record the same as the second last just to make it look nicer
+        data[recordCount] = data[recordCount-1];
 
         double[][] xAxis = new double[recordCount + 1][];
         for (int i = 0; i < xAxis.length; i++) {
@@ -72,6 +78,6 @@ public class CallGraph extends GenericGuildInfoGraph{
 
     @Override
     public void displayPlot() {
-
+        plotter.plot();
     }
 }
