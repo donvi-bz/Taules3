@@ -1,5 +1,5 @@
 # Using Placeholders:
-uLoc = "D:/Laptop/Java/Taules3/plot/data.txt"
+uLoc = "D:/Laptop/Java/Taules3/plot/messageData_001.txt"
 
 # Variables
 lineW = 2
@@ -13,7 +13,7 @@ set xlabel "Time of day (EST)" font ",13"
 set ylabel "Messages per hour" font ",13"
 
 set xtics 1
-set ytics 1
+set ytics 10
 set grid
 set key left top box width 1 height 1
 

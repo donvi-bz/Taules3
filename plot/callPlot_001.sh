@@ -1,5 +1,5 @@
 # Using Placeholders:
-uLoc = "D:/Laptop/Java/Taules3/plot/data.txt"
+uLoc = "D:/Laptop/Java/Taules3/plot/callData_001.txt"
 
 # Variables
 lineW = 2
@@ -7,17 +7,17 @@ lineW = 2
 # Settings
 set terminal wxt size 1600,900
 set xrange [0:24]
-set yrange [0:200]
+set yrange [0:10]
 
 set xlabel "Time of day (EST)" font ",13"
-set ylabel "Messages per hour" font ",13"
+set ylabel "Users in a call" font ",13"
 
 set xtics 1
 set ytics 1
 set grid
 set key left top box width 1 height 1
 
-set title "Text Chat Activity"
+set title "Voice Call Activity"
 set title font ",20" offset 0,-1
 
 #/!

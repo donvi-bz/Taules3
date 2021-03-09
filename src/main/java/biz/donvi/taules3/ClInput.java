@@ -117,7 +117,7 @@ public class ClInput {
 
     private void generateCallPlot(String args){
         String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
-        new CallGraph(2, 2).generatePlot(taules.dataManager, guildName, 1);
+        new CallGraph(1, 1).generatePlot(taules.dataManager, guildName, 1);
     }
 
 }

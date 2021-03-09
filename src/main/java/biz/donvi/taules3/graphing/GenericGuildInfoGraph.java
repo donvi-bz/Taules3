@@ -5,10 +5,14 @@ import biz.donvi.taules3.data.DataManager;
 
 public abstract class GenericGuildInfoGraph {
 
+    static String plottingRoot = "plot/";
+
     Plotter plotter;
 
-    public GenericGuildInfoGraph(int plotFile, int dataFile) {
-        plotter = new Plotter();
+    public GenericGuildInfoGraph(int plotFileNum, String plotFileName, int dataFileNum, String dataFileName) {
+        plotter = new Plotter()
+            .usePlotFile(plottingRoot + plotFileName, plotFileNum)
+            .useDataFile(plottingRoot + dataFileName, dataFileNum);
     }
 
     public abstract void generatePlot(DataManager dataManager, String guildName, int averageOver);

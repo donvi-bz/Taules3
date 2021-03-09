@@ -11,7 +11,7 @@ import java.util.List;
 public class CallGraph extends GenericGuildInfoGraph{
 
     public CallGraph(int plotFile, int dataFile) {
-        super(plotFile, dataFile);
+        super(plotFile, "callPlot.sh", dataFile, "callData.txt");
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CallGraph extends GenericGuildInfoGraph{
             xAxis[i] = new double[]{(double)i/60};
         }
         plotter.writeData(xAxis, data);
-        plotter.plot();
+        plotter.plot(true);
     }
 
     @Override

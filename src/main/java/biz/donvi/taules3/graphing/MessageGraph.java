@@ -10,7 +10,7 @@ import java.util.List;
 public class MessageGraph extends GenericGuildInfoGraph {
 
     public MessageGraph(int plotFile, int dataFile) {
-        super(plotFile, dataFile);
+        super(plotFile, "messagePlot.sh", dataFile, "messageData.txt");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MessageGraph extends GenericGuildInfoGraph {
             xAxis[i] = new double[]{(double)i/60};
         }
         plotter.writeData(xAxis, data);
-        plotter.plot();
+        plotter.plot(true);
     }
 
     @Override
