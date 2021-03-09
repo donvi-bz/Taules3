@@ -4,60 +4,63 @@ u1a = 1
 u1b = 2
 
 # Variables
-rangeMax = 0
-rangeMin = 7 * 24
 lineW = 2
 
 # Settings
 set terminal wxt size 1600,900
 set xrange [0:24]
-set yrange [-1:200]
+set yrange [0:200]
 
-set xlabel "Time (hours)"
-set ylabel "Messages sent"
+set xlabel "Time of day (EST)" font ",13"
+set ylabel "Messages per hour" font ",13"
 
 set xtics 1
-set key left top box
+set ytics 1
+set grid
+set key left top box width 1 height 1
+
+set title "Text Chat Activity"
+set title font ",20" offset 0,-1
 
 #/!
 
 plot \
-  uLoc using 0:1 \
+  uLoc using 1:2 \
   title "Sunday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:2 \
+  uLoc using 1:3 \
   title "Monday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:3 \
+  uLoc using 1:4 \
   title "Tuesday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:4 \
+  uLoc using 1:5 \
   title "Wednesday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:5 \
+  uLoc using 1:6 \
   title "Thursday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:6 \
+  uLoc using 1:7 \
   title "Friday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:7 \
+  uLoc using 1:8 \
   title "Saturday"\
   with lines \
   linewidth lineW \
   , \
-  uLoc using 0:8 \
+  uLoc using 1:9 \
   title "Average"\
   with lines \
   linewidth lineW*2

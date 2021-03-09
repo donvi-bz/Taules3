@@ -1,35 +1,44 @@
 package biz.donvi.taules3.graphing;
 
-import biz.donvi.gnuPlotter.Plotter;
 import biz.donvi.taules3.data.DataManager;
-import biz.donvi.taules3.data.models.MessageAggregate;
+import biz.donvi.taules3.data.models.MessageActivityAggregate;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
 
 import java.util.List;
 
-public class MessageGraph {
-
-    static final String plotLocation = "/plot/";
-
-    Plotter plotter;
+public class MessageGraph extends GenericGuildInfoGraph {
 
     public MessageGraph(int plotFile, int dataFile) {
-        plotter = new Plotter();
+        super(plotFile, dataFile);
     }
 
-    public void generatePlot(DataManager dataManager) {
-        Query<MessageAggregate> query = DB.find(MessageAggregate.class);
-        query.setRawSql(MessageAggregate.getRawSQL());
-        List<MessageAggregate> items = query.findList();
-        double[][] data = new double[24 + 1][];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = new double[8];
-        }
-        for(MessageAggregate ma : items) {
-            data[ma.getHourOfDay()][ma.getDayOfWeek()] = (double) ma.getMessageCount() / ma.getDaysSampled();
+    @Override
+    public void generatePlot(DataManager dataManager, String guildName, int averageOver) {
+        Query<MessageActivityAggregate> query = DB.find(MessageActivityAggregate.class);
+        query.setRawSql(MessageActivityAggregate.getRawSQL(guildName));
+        List<MessageActivityAggregate> items = query.findList();
+        // We need one point for every minute of the day plus one extra
+        final int recordCount = 24 * 60;
+        double[][] data = new double[recordCount + 1][];
+        // Eight data points, one for each day of the week + one for average
+        for (int i = 0; i < data.length; i++)  data[i] = new double[8];
+
+        final int leftHalf = averageOver / 2;
+        final int rightHalf  = averageOver - leftHalf;
+        double[] smoothingCurve = getRoundingCurve(averageOver);
+
+        for(MessageActivityAggregate ma : items) {
+            int dayOfWeek = ma.getDayOfWeek();
+            int minute = ma.getTimeOfDay();
+            double messageAvgAtTime = (double) ma.getMessageCount() / ma.getDaysSampled();
+            for (int i = minute - leftHalf, j = 0; i < minute + rightHalf; i++, j++) {
+                try {
+                    data[(i + recordCount) % recordCount][dayOfWeek] += 60 * messageAvgAtTime * smoothingCurve[j];
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         for (int i = 0; i < data.length; i++) {
             double sum = 0;
@@ -37,15 +46,19 @@ public class MessageGraph {
                 sum += data[i][j];
             data[i][7] = sum / 7;
         }
-        data[24] = data[0];
+        data[recordCount] = data[0];
 
-        plotter.writeData(data);
+        double[][] xAxis = new double[recordCount + 1][];
+        for (int i = 0; i < xAxis.length; i++) {
+            xAxis[i] = new double[]{(double)i/60};
+        }
+        plotter.writeData(xAxis, data);
         plotter.plot();
     }
 
+    @Override
     public void displayPlot() {
         plotter.plot(true);
     }
-
 
 }

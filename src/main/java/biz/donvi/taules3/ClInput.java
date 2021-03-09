@@ -1,6 +1,6 @@
 package biz.donvi.taules3;
 
-import biz.donvi.taules3.Taules;
+import biz.donvi.taules3.graphing.CallGraph;
 import biz.donvi.taules3.graphing.MessageGraph;
 import biz.donvi.taules3.util.ConsoleColor;
 import biz.donvi.taules3.util.Util;
@@ -19,17 +19,18 @@ public class ClInput {
     private final Taules taules;
     private final Scanner in;
 
-    private Map<String, Consumer<String>> commands = new HashMap<>();
+    private final Map<String, Consumer<String>> commands = new HashMap<>();
 
     public ClInput(Taules taules) {
         this.taules = taules;
         in = new Scanner(System.in);
-        commands.put("help", this::cmdHelp);
-        commands.put("update-guilds",this::cmdUpdateGuilds);
-        commands.put("update-users", this::cmdUpdateUsers);
-        commands.put("active-dir", this::cmdPrintActiveDir);
+        commands.put("help",                 this::cmdHelp);
+        commands.put("update-guilds",        this::cmdUpdateGuilds);
+        commands.put("update-users",         this::cmdUpdateUsers);
+        commands.put("active-dir",           this::cmdPrintActiveDir);
         commands.put("update-current-calls", this::cmdUpdateCurrentCalls);
-        commands.put("plot-messages",this::generatePlot);
+        commands.put("plot-messages",        this::generateMessagePlot);
+        commands.put("plot-calls",           this::generateCallPlot);
 
     }
 
@@ -42,12 +43,12 @@ public class ClInput {
     }
 
     private void getInput(final String input) {
-        String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ") - 1) : input;
+        String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ")) : input;
         commands.getOrDefault(firstArg, this::cmdNotFound).accept(input);
     }
 
     private void cmdNotFound(String input) {
-        String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ") - 1) : input;
+        String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ")) : input;
         System.out.println(
             ConsoleColor.YELLOW +
             "Could not find command '" + firstArg + "' did you mean one of these?\n"  + ConsoleColor.RESET +
@@ -93,8 +94,30 @@ public class ClInput {
             " milliseconds.");
     }
 
-    private void generatePlot(String args){
-        new MessageGraph(1,1).generatePlot(taules.dataManager);
+    private void generateMessagePlot(String args){
+        boolean showUsage = false;
+        if (args.substring(args.indexOf(' ') + 1).startsWith("?")){
+            System.out.println("Usage:");
+            showUsage = true;
+        } else {
+            try {
+                String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
+                int averageOver = Integer.parseInt(args.substring(args.lastIndexOf(' ') + 1));
+                System.out.println("Generating plot for '" + guildName + "' averaging over " + averageOver + " minutes...");
+                new MessageGraph(1,1).generatePlot(taules.dataManager, guildName, averageOver);
+            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                System.out.println("Incorrect format. Proper usage:");
+                showUsage = true;
+            }
+        }
+        if (showUsage) System.out.println(
+            ConsoleColor.YELLOW + "plot-messages \"<Guild Name>\" <average-over>" + ConsoleColor.RESET);
+
+    }
+
+    private void generateCallPlot(String args){
+        String guildName = args.substring(args.indexOf('"') + 1, args.lastIndexOf('"'));
+        new CallGraph(2, 2).generatePlot(taules.dataManager, guildName, 1);
     }
 
 }

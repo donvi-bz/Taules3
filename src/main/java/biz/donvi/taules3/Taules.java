@@ -28,9 +28,9 @@ public class Taules {
 
     private Taules() throws LoginException, IOException {
         GenericListener gl = new GenericListener(this);
-        scheduler.scheduleAtFixedRate(() -> {if (!keepRunning()) scheduler.shutdown();}, 1, 1, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(gl::periodicUpdate, 2, 57, TimeUnit.SECONDS);
-//
+        scheduler.scheduleAtFixedRate(() -> {if (!keepRunning()) scheduler.shutdown();}, 5, 15, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(gl::periodicUpdate, 2, 7, TimeUnit.MINUTES);
+
         initDb();
         jda = JDABuilder
             .createDefault(getResourceFileAsString("token"))
