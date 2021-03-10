@@ -24,41 +24,41 @@ set title font ",20" offset 0,-1
 
 plot \
   uLoc using 1:2 \
-  title "Sunday"\
+  title "Sunday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:3 \
-  title "Monday"\
+  title "Monday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:4 \
-  title "Tuesday"\
+  title "Tuesday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:5 \
-  title "Wednesday"\
+  title "Wednesday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:6 \
-  title "Thursday"\
+  title "Thursday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:7 \
-  title "Friday"\
+  title "Friday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:8 \
-  title "Saturday"\
+  title "Saturday" \
   with lines \
   linewidth lineW \
   , \
   uLoc using 1:9 \
-  title "Average"\
+  title "Average" \
   with lines \
   linewidth lineW*2

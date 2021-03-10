@@ -17,13 +17,11 @@ import java.util.stream.Collectors;
 
 public class ClInput {
     private final Taules taules;
-    private final Scanner in;
 
     private final Map<String, Consumer<String>> commands = new HashMap<>();
 
     public ClInput(Taules taules) {
         this.taules = taules;
-        in = new Scanner(System.in);
         commands.put("help",                 this::cmdHelp);
         commands.put("l",                    null);
         commands.put("last",                 null);
@@ -37,23 +35,32 @@ public class ClInput {
     }
 
     public void inputLoop() {
+        Scanner in = new Scanner(System.in);
         while (taules.keepRunning()) try{
             getInput(in.nextLine());
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        in.close();
     }
 
     private String lastInput = "";
 
     private void getInput(String input) {
-        if (input.equalsIgnoreCase("l") || input.equalsIgnoreCase("last")) {
-            System.out.println("Running last input:\n" + lastInput);
-            input = lastInput;
+        final boolean runLast = input.equalsIgnoreCase("l")
+                             || input.equalsIgnoreCase("last");
+        if (runLast) {
+            if (!lastInput.equals("")) {
+                System.out.println(
+                    ConsoleColor.YELLOW + "Running last input:\n" +
+                    ConsoleColor.WHITE + ConsoleColor.BLACK_BACKGROUND  + lastInput +
+                    ConsoleColor.RESET);
+                input = lastInput;
+            } else System.out.println(ConsoleColor.YELLOW + "No saved command to run.");
         }
         String firstArg = input.contains(" ") ? input.substring(0, input.indexOf(" ")) : input;
         commands.getOrDefault(firstArg, this::cmdNotFound).accept(input);
-        lastInput = input;
+        if (!runLast) lastInput = input;
     }
 
     private void cmdNotFound(String input) {
@@ -75,7 +82,8 @@ public class ClInput {
 
     private void cmdHelp(String args) {
         System.out.println(
-            "Command list: " + Util.listOut(commands.keySet().stream().sorted().collect(Collectors.toList())));
+            ConsoleColor.YELLOW + "Command list: " +
+            ConsoleColor.RESET + Util.listOut(commands.keySet().stream().sorted().collect(Collectors.toList())));
     }
 
     private void cmdUpdateGuilds(String args){
