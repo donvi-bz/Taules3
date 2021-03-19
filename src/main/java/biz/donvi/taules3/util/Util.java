@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -41,4 +43,6 @@ public class Util {
         updateGuilds.run();
         return System.currentTimeMillis() - start;
     }
+
+    public static Timestamp timeStampNow() {return new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());}
 }

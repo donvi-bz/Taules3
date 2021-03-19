@@ -2,6 +2,9 @@ package biz.donvi.taules3;
 
 
 import biz.donvi.taules3.data.DataManager;
+import biz.donvi.taules3.data.models.BotLifeModel;
+import biz.donvi.taules3.util.Util;
+import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
@@ -28,8 +31,9 @@ public class Taules {
 
     private Taules() throws LoginException, IOException {
         GenericListener gl = new GenericListener(this);
-        scheduler.scheduleAtFixedRate(() -> {if (!keepRunning()) scheduler.shutdown();}, 5, 15, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(gl::periodicUpdate, 2, 7, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::maybeShutDown,     5,  15, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(gl::periodicUpdate,      2,  7,  TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(Taules::addLivingRecord, 9,  59, TimeUnit.MINUTES);
 
         initDb();
         jda = JDABuilder
@@ -41,6 +45,8 @@ public class Taules {
         scheduler.shutdown();
         System.out.println("Taules down.");
     }
+
+    private static void addLivingRecord() {DB.save(new BotLifeModel(Util.timeStampNow()));}
 
     private void initDb() {
         String connDetails = null;
@@ -67,4 +73,5 @@ public class Taules {
         return jda != null && jda.getStatus() != JDA.Status.SHUTDOWN;
     }
 
+    private void maybeShutDown() {if (!keepRunning()) scheduler.shutdown();}
 }

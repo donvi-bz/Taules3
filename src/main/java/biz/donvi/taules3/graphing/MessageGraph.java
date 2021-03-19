@@ -31,7 +31,7 @@ public class MessageGraph extends GenericGuildInfoGraph {
         for(MessageActivityAggregate ma : items) {
             int dayOfWeek = ma.getDayOfWeek();
             int minute = ma.getTimeOfDay();
-            double messageAvgAtTime = (double) ma.getMessageCount() / ma.getDaysSampled(); // todo not the right average
+            double messageAvgAtTime = (double) ma.getMessageCount() / ma.getDaysSampled();
             for (int i = minute - leftHalf, j = 0; i < minute + rightHalf; i++, j++) {
                 try {
                     int plotDay = dayOfWeek + 7;
