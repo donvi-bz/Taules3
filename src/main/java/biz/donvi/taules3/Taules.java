@@ -41,9 +41,9 @@ public class Taules {
             .setEventManager(new AnnotatedEventManager())
             .addEventListeners(gl)
             .build();
-        new ClInput(this).inputLoop();
-        scheduler.shutdown();
-        System.out.println("Taules down.");
+//        new ClInput(this).inputLoop();
+//        scheduler.shutdown();
+//        System.out.println("Taules down.");
     }
 
     private static void addLivingRecord() {DB.save(new BotLifeModel(Util.timeStampNow()));}
