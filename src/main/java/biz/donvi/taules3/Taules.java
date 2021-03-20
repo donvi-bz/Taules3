@@ -34,7 +34,6 @@ public class Taules {
         scheduler.scheduleAtFixedRate(this::maybeShutDown,     5,  15, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(gl::periodicUpdate,      2,  7,  TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(Taules::addLivingRecord, 9,  59, TimeUnit.MINUTES);
-        System.out.println(getResourceFileAsString("token"));
         initDb();
         jda = JDABuilder
             .createDefault(getResourceFileAsString("token"))

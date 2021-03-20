@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.nio.file.Files.newInputStream;
 
 public class Util {
 
@@ -22,8 +26,9 @@ public class Util {
      */
     public static String getResourceFileAsString(String fileName) throws IOException {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        try (InputStream is = classLoader.getResourceAsStream(fileName)) {
-            if (is == null) return null;
+        try (InputStream tmp = classLoader.getResourceAsStream(fileName);
+             InputStream is = (tmp != null ? tmp : newInputStream(Paths.get(fileName)))
+        ) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 return reader.lines().collect(Collectors.joining(System.lineSeparator()));
             }
