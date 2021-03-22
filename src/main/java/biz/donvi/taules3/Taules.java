@@ -43,8 +43,9 @@ public class Taules {
             .build();
 
 //        new ClInput(this).inputLoop();
-//        scheduler.shutdown();
-//        System.out.println("Taules down.");
+        inputLoop();
+        scheduler.shutdown();
+        System.out.println("Taules down.");
     }
 
     private static void addLivingRecord() {DB.save(new BotLifeModel(Util.timeStampNow()));}
@@ -76,9 +77,9 @@ public class Taules {
 
     private void maybeShutDown() {if (!keepRunning()) scheduler.shutdown();}
 
-        public void inputLoop() {
+    public void inputLoop() {
         Scanner in = new Scanner(System.in);
-        while (keepRunning()) try{
+        while (keepRunning()) try {
             if (in.nextLine().equalsIgnoreCase("q")) jda.shutdown();
         } catch (Throwable t) {
             t.printStackTrace();
