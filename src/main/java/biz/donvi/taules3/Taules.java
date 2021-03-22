@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +41,7 @@ public class Taules {
             .setEventManager(new AnnotatedEventManager())
             .addEventListeners(gl)
             .build();
+
 //        new ClInput(this).inputLoop();
 //        scheduler.shutdown();
 //        System.out.println("Taules down.");
@@ -73,4 +75,14 @@ public class Taules {
     }
 
     private void maybeShutDown() {if (!keepRunning()) scheduler.shutdown();}
+
+        public void inputLoop() {
+        Scanner in = new Scanner(System.in);
+        while (keepRunning()) try{
+            if (in.nextLine().equalsIgnoreCase("q")) jda.shutdown();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        in.close();
+    }
 }
