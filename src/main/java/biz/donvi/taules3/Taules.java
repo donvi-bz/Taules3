@@ -81,10 +81,11 @@ public class Taules {
     public void inputLoop() {
         Scanner in = new Scanner(System.in);
         while (keepRunning()) try {
-            if (in.nextLine().equalsIgnoreCase("q")) {
+            String input = in.nextLine();
+            if (input.equalsIgnoreCase("q")) {
                 System.out.println("Received shutdown request.");
                 jda.shutdown();
-            }
+            } else System.out.println(input); // DEBUG LINE
         } catch (Throwable t) {
             t.printStackTrace();
         }
