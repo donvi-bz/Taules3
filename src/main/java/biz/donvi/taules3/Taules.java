@@ -44,6 +44,7 @@ public class Taules {
 
 //        new ClInput(this).inputLoop();
         inputLoop();
+        System.out.println("The bot is down, shutting down the scheduler.");
         scheduler.shutdown();
         System.out.println("Taules down.");
     }
@@ -80,7 +81,10 @@ public class Taules {
     public void inputLoop() {
         Scanner in = new Scanner(System.in);
         while (keepRunning()) try {
-            if (in.nextLine().equalsIgnoreCase("q")) jda.shutdown();
+            if (in.nextLine().equalsIgnoreCase("q")) {
+                System.out.println("Received shutdown request.");
+                jda.shutdown();
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
